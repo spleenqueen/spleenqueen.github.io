@@ -6,8 +6,8 @@
 
     <title>World Cup Predictor - A Case Study</title>
 
-    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-    <meta name="author" content="Hakim El Hattab">
+    <meta name="description" content="A case study of a World Cup Predictor website.">
+    <meta name="author" content="Alison Hover">
 
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -68,13 +68,18 @@
             <p>
                 <img src="img/paper-predictor.png" alt="Paper Prediction"/>
             </p>
+
+            <aside class="notes">
+                Wanted to create a website version of a previous competition run on paper.
+                Participants predict the outcomes of group stages and then the outcomes of matches throughout the stages of the World Cup as well as picking a tournament leading scorer.
+            </aside>
         </section>
 
         <section>
-            <h2>Functional prototype</h2>
+            <h2>The Initial Build</h2>
             <ul>
                 <li>2 weeks (in spare time) to build</li>
-                <li>Drupal 7 using a custom Installation Profile</li>
+                <li>Drupal 7</li>
                 <li>Minimum viable product:
                     <ul>
                         <li>Allow users to login and manage their Prediction</li>
@@ -85,12 +90,12 @@
                 </li>
             </ul>
             <aside class="notes">
-                <p>Because of the time constraint, I wanted to get a "minimum viable product" up and online so that people could get sign up and make their predictions with plenty of time ahead of the Group Stages.</p>
+                <p>Because of the time constraint, I wanted to get a "minimum viable product" up and online so that people could get signed up and make their predictions with enough time ahead of the Group Stages.</p>
             </aside>
         </section>
 
         <section>
-            <h2>Content types: Teams &amp; Players</h2>
+            <h2>Content types</h2>
             <ul>
                 <li>Team
                     <ul>
@@ -101,14 +106,18 @@
                 <li>Player
                     <ul>
                         <li>Imported 736 players via CSV using the Feeds module</li>
-                        <li>Each player has a field corresponding to an ISO country code on their associated Team.</li>
+                        <li>Country code corresponding to their Team.</li>
                     </ul>
                 </li>
             </ul>
+            <aside class="notes">
+                <p>3 Main content types: Team, Player and Prediction.</p>
+                <p>Group vocab so teams can be tagged with their Group in the tournament.</p>
+            </aside>
         </section>
 
         <section>
-            <h2>Content types: Prediction</h2>
+            <h2>Prediction content type</h2>
             <ul>
                 <li>
                     <a href="http://drupal.org/rules">Rules</a> module used to create a user's Prediction when their account has been manually approved.
@@ -116,10 +125,10 @@
                 <li>Each team slot was an Entity Reference field, referencing a Team node
                 <li>Fields enabled/disabled using Form API states functionality and Points fields hidden from view (via
                     <code>hook_form_alter</code>).
-                <li>Fields linked together using Javascript so when one was updated, the next in the sequence would be populated.</li>
+                <li>Fields linked together using Javascript so when one was updated, the options for the next in the sequence would be populated.</li>
             </ul>
             <aside class="notes">
-                <p>For round 1 - the Entity selection mode was set to use a view that could be passed a Group argument. These fields then returned only the Team options for that group.</p>
+                <p>For Group Stage fields the Entity selection mode was set to use a view that could be passed a Group argument. These fields then returned only the Team options for their group.</p>
 
                 <p>Initially, I wanted to link the fields together using AJAX. But this proved time-consuming getting all the dependent fields working together without causing validation errors and - more importantly - caused an unnacceptable lag for the user. Ultimately, I wrote some custom Javascript for this.</p>
             </aside>
@@ -134,7 +143,7 @@
                 <li>A module for Predictions which:
                     <ul>
                         <li>Implemented
-                            <code>hook_form_alter</code> on the Prediction node form
+                            <code>hook_form_alter</code> on the Prediction node edit form
                         </li>
                         <li>Implemented
                             <code>hook_field_attach_view_alter</code> to force the rendering of empty fields.
@@ -149,17 +158,17 @@
             <ul>
                 <li>Contained helper functions for:
                     <ol>
-                        <li>Which fields were related to and affected others</li>
+                        <li>Which fields were related to, and affected, others</li>
                         <li>The structure of the rounds and how many points things were worth, for use with scoring later.</li>
                     </ol>
                 </li>
-                <li>The PHP script to be executed for scoring predictions - this was executed usings
+                <li>The PHP script to be executed for scoring predictions - this was executed using
                     <a href="http://drupal.org/views_bulk_operations">Views Bulk Operations</a> module.
                 </li>
             </ul>
 
             <aside class="notes">
-                <p>This was used for determining the States functionality and in the javascript on the node form and for the scoring of predictions</p>
+                <p>This was used for determining the States functionality, in the javascript on the node edit form and for the scoring of predictions</p>
 
                 <p>Executed using a View that implemented the
                     <a href="http://drupal.org/views_bulk_operations">Views Bulk Operations</a> module, specifically its "Execute Arbitrary PHP Script" functionality.
@@ -171,7 +180,7 @@
             <ul>
                 <li>There was little time to implement a full, responsive theme</li>
                 <li>The Predictor node itself needed a custom interface to enable the user to clearly see team progression</li>
-                <li>This was achieved using Flexslider and some custom Javascript to generate CSS transformations to visually link fields.
+                <li>This was achieved using <a href="http://www.woothemes.com/flexslider/">Flexslider</a> and some custom Javascript to generate CSS transformations to visually link fields.
                 <pre><code data-trim contenteditable>
 var length = Math.sqrt(
     (destX - originX)
@@ -188,13 +197,13 @@ var angle = 180 / 3.14 * Math.acos((destY - originY) / length);
         <section>
             <h2>Post go-live functionality</h2>
             <ul>
-                <li>Points "as it stands"</li>
                 <li>Mini "leagues" functionality</li>
+                <li>Points "as it stands"</li>
                 <li>Colour-coding of correct/incorrect predictions</li>
                 <li>And of course - bug fixing on the fly!</li>
             </ul>
             <aside class="notes">
-                By building things simply and using contrib modules wherever possible the site was very easy to build upon and add functionality to.
+                By building things simply and using Contrib modules wherever possible the site was very easy to build upon and add functionality to.
             </aside>
 
         </section>
