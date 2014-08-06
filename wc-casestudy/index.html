@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>World Cup Predictor - A Case Study</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <style type="text/css">
+        .reveal li {
+            padding: 0.25em 0;
+        }
+    </style>
+
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+        if (window.location.search.match(/print-pdf/gi)) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = 'css/print/pdf.css';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>        <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section>
+            <h1>World Cup Predictor</h1>
+
+            <h3>A Case Study</h3>
+
+            <p>
+                <small>By <a href="http://alisonhover.com">Alison Hover</a> /
+                    <a href="http://twitter.com/spleenqueen">@spleenqueen</a>
+                </small>
+            </p>
+        </section>
+
+        <section>
+            <h2>The Project Outline</h2>
+
+            <p>
+                To create a online version of a World Cup Predictor competition: </p>
+
+            <p>
+                <img src="img/paper-predictor.png" alt="Paper Prediction"/>
+            </p>
+        </section>
+
+        <section>
+            <h2>Functional prototype</h2>
+            <ul>
+                <li>2 weeks (in spare time) to build</li>
+                <li>Drupal 7 using a custom Installation Profile</li>
+                <li>Minimum viable product:
+                    <ul>
+                        <li>Allow users to login and manage their Prediction</li>
+                        <li>Automate the scoring of predictions</li>
+                        <li>League table of points</li>
+                        <li>Basic theming and user interface</li>
+                    </ul>
+                </li>
+            </ul>
+            <aside class="notes">
+                <p>Because of the time constraint, I wanted to get a "minimum viable product" up and online so that people could get sign up and make their predictions with plenty of time ahead of the Group Stages.</p>
+            </aside>
+        </section>
+
+        <section>
+            <h2>Content types: Teams &amp; Players</h2>
+            <ul>
+                <li>Team
+                    <ul>
+                        <li>With ISO country code to link Teams to players</li>
+                        <li>Term reference from "Group" vocabulary</li>
+                    </ul>
+                </li>
+                <li>Player
+                    <ul>
+                        <li>Imported 736 players via CSV using the Feeds module</li>
+                        <li>Each player has a field corresponding to an ISO country code on their associated Team.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Content types: Prediction</h2>
+            <ul>
+                <li>
+                    <a href="http://drupal.org/rules">Rules</a> module used to create a user's Prediction when their account has been manually approved.
+                </li>
+                <li>Each team slot was an Entity Reference field, referencing a Team node
+                <li>Fields enabled/disabled using Form API states functionality and Points fields hidden from view (via
+                    <code>hook_form_alter</code>).
+                <li>Fields linked together using Javascript so when one was updated, the next in the sequence would be populated.</li>
+            </ul>
+            <aside class="notes">
+                <p>For round 1 - the Entity selection mode was set to use a view that could be passed a Group argument. These fields then returned only the Team options for that group.</p>
+
+                <p>Initially, I wanted to link the fields together using AJAX. But this proved time-consuming getting all the dependent fields working together without causing validation errors and - more importantly - caused an unnacceptable lag for the user. Ultimately, I wrote some custom Javascript for this.</p>
+            </aside>
+        </section>
+
+        <section>
+            <h2>Custom Modules</h2>
+
+            <p>Only 2 custom modules were required:
+            <ol>
+                <li>A module that added a small bit of extra validation to user registration.</li>
+                <li>A module for Predictions which:
+                    <ul>
+                        <li>Implemented
+                            <code>hook_form_alter</code> on the Prediction node form
+                        </li>
+                        <li>Implemented
+                            <code>hook_field_attach_view_alter</code> to force the rendering of empty fields.
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Custom Modules, continued</h2>
+            <ul>
+                <li>Contained helper functions for:
+                    <ol>
+                        <li>Which fields were related to and affected others</li>
+                        <li>The structure of the rounds and how many points things were worth, for use with scoring later.</li>
+                    </ol>
+                </li>
+                <li>The PHP script to be executed for scoring predictions - this was executed usings
+                    <a href="http://drupal.org/views_bulk_operations">Views Bulk Operations</a> module.
+                </li>
+            </ul>
+
+            <aside class="notes">
+                <p>This was used for determining the States functionality and in the javascript on the node form and for the scoring of predictions</p>
+
+                <p>Executed using a View that implemented the
+                    <a href="http://drupal.org/views_bulk_operations">Views Bulk Operations</a> module, specifically its "Execute Arbitrary PHP Script" functionality.
+            </aside>
+        </section>
+
+        <section>
+            <h2>Theme</h2>
+            <ul>
+                <li>There was little time to implement a full, responsive theme</li>
+                <li>The Predictor node itself needed a custom interface to enable the user to clearly see team progression</li>
+                <li>This was achieved using Flexslider and some custom Javascript to generate CSS transformations to visually link fields.
+                <pre><code data-trim contenteditable>
+var length = Math.sqrt(
+    (destX - originX)
+    * (destX - originX)
+    + (destY - originY)
+    * (destY - originY));
+
+var angle = 180 / 3.14 * Math.acos((destY - originY) / length);
+                </code></pre>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Post go-live functionality</h2>
+            <ul>
+                <li>Points "as it stands"</li>
+                <li>Mini "leagues" functionality</li>
+                <li>Colour-coding of correct/incorrect predictions</li>
+                <li>And of course - bug fixing on the fly!</li>
+            </ul>
+            <aside class="notes">
+                By building things simply and using contrib modules wherever possible the site was very easy to build upon and add functionality to.
+            </aside>
+
+        </section>
+
+        <section>
+            <h1>THANKS!</h1>
+
+            <h3>Any Questions?</h3>
+        </section>
+
+    </div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+
+    // Full list of configuration options available here:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'fade', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Parallax scrolling
+        // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+        // parallaxBackgroundSize: '2100px 900px',
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            { src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            } },
+            { src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            } },
+            { src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            } },
+            { src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            } },
+            { src: 'plugin/zoom-js/zoom.js', async: true, condition: function () {
+                return !!document.body.classList;
+            } },
+            { src: 'plugin/notes/notes.js', async: true, condition: function () {
+                return !!document.body.classList;
+            } }
+        ]
+    });
+
+</script>
+
+</body>
+</html>
